@@ -1,0 +1,100 @@
+name: E2E
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+   
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: 6.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore
+    - name: Setup (Install PowerDNS, CouchDB)
+      continue-on-error: true
+      run: |
+        sudo apt-get update && sudo apt-get upgrade
+        sudo apt-get install curl apt-transport-https gnupg dnsutils
+        echo "deb [arch=amd64] http://repo.powerdns.com/ubuntu focal-auth-46 main" | sudo tee -a /etc/apt/sources.list.d/pdns.list
+        sudo tee -a /etc/apt/preferences.d/pdns > /dev/null <<EOT
+        Package: pdns-*
+        Pin: origin repo.powerdns.com
+        Pin-Priority: 600
+        EOT
+        curl https://repo.powerdns.com/FD380FBB-pub.asc | sudo apt-key add - &&
+        sudo apt-get update -y &&
+        sudo apt-get install pdns-server -y && sudo apt-get install pdns-backend-remote -y
+        sudo mkdir -p /etc/powerdns
+        sudo tee /etc/powerdns/pdns.conf > /dev/null <<EOF
+        config-dir=/etc/pdns
+        setuid=pdns
+        setgid=pdns
+        log-dns-details=yes
+        log-dns-queries=yes
+        local-address=0.0.0.0:9753
+        launch=remote
+        remote-connection-string=http:url=http://127.0.0.1:5112/dns
+        EOF
+        curl https://couchdb.apache.org/repo/keys.asc | gpg --dearmor | sudo tee /usr/share/keyrings/couchdb-archive-keyring.gpg >/dev/null 2>&1 && source /etc/os-release && echo "deb [signed-by=/usr/share/keyrings/couchdb-archive-keyring.gpg] https://apache.jfrog.io/artifactory/couchdb-deb/ ${VERSION_CODENAME} main" | sudo tee /etc/apt/sources.list.d/couchdb.list >/dev/null
+        sudo apt-get update
+        echo "couchdb couchdb/mode select standalone
+                  couchdb couchdb/mode seen true
+                  couchdb couchdb/nodename string couchdb@127.0.0.1
+                  couchdb couchdb/nodename seen true
+                  couchdb couchdb/bindaddress string 0.0.0.0
+                  couchdb couchdb/bindaddress seen true
+                  couchdb couchdb/cookie string 549jt90gtff
+                  couchdb couchdb/cookie seen true
+                  couchdb couchdb/adminpass password password
+                  couchdb couchdb/adminpass seen true
+                  couchdb couchdb/adminpass_again password password
+                  couchdb couchdb/adminpass_again seen true" | sudo debconf-set-selections
+                  DEBIAN_FRONTEND=noninteractive sudo apt-get install -y couchdb
+    - name: Start up CouchDB
+      run: sudo systemctl start couchdb && sleep 1 && sudo systemctl status couchdb
+    - name: Set up CouchDB Records Database
+      run: curl -X PUT http://admin:password@127.0.0.1:5984/dns_records
+    - name: Set up CouchDB Zones Database
+      run: curl -X PUT http://admin:password@127.0.0.1:5984/dns_zones
+    - name: Start up CouchDB PowerDns Backend
+      run: dotnet run --project Server &
+    - name: Set up Basic Domain
+      run: |
+        cd CLI
+        dotnet run create-zone example.com
+        dotnet run create-zone example.com
+        dotnet run add-record example.com @ A 192.168.1.2
+        dotnet run add-record example.com @ AAAA 2a01:4f9:c010:30f4::1
+        dotnet run add-record example.com www A 192.168.1.2
+        dotnet run add-record example.com @ NS ns.example.com
+        dotnet run add-record example.com NS A 127.0.0.1
+        dotnet run add-record example.com @ SOA "ns.example.com. webadm.example.com. 3 10000 2400 604800 3600"
+    - name: Start up PowerDNS
+      run:  | 
+        sudo chown -R pdns:pdns /etc/powerdns
+        sudo systemctl restart pdns 
+        sleep 1 
+        sudo systemctl status pdns
+    - name: curl
+      run: curl http://127.0.0.1:5112/dns/lookup/example.com./ANY
+    - name: Dig
+      run: dig A example.com @127.0.0.1 -p 9753
+    - name: Dig
+      run: dig ANY example.com @127.0.0.1 -p 9753
+    - name: Print Log info Asp.net app(any errors, etc)
+      run: logname=`/bin/ls -1td Server/Logs/*| /usr/bin/head -n1` && cat $logname
+    - name: Print any PowerDNS Errors
+      run: journalctl -u pdns -r
+   
+
+
