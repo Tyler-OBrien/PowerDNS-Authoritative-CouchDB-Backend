@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -70,7 +71,20 @@ public class Program
         builder.Services.AddSwaggerGen();
 
 
-        builder.WebHost.UseKestrel(options => { options.AddServerHeader = false; });
+        builder.WebHost.UseKestrel(options =>
+        {
+            options.AddServerHeader = false;
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                const string UnixSocketPath = "/var/run/powerdns-backend.sock";
+                if (File.Exists(UnixSocketPath))
+                {
+                    File.Delete(UnixSocketPath);
+                }
+
+                options.ListenUnixSocket(UnixSocketPath);
+            }
+        });
 
 
         builder.Services.AddScoped<IAPIBroker, APIBroker>();
