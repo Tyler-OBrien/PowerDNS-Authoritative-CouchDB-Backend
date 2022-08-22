@@ -2,6 +2,8 @@ using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Polly;
+using Polly.Extensions.Http;
 using PowerDNS_Auth_CouchDB_Remote_Backend.Brokers;
 using PowerDNS_Auth_CouchDB_Remote_Backend.Middleware;
 using PowerDNS_Auth_CouchDB_Remote_Backend.Models.Configuration;
@@ -54,7 +56,6 @@ public class Program
 
         // Add services to the container.
 
-        builder.Services.AddHttpClient();
 
 
         builder.Services.Configure<ApplicationConfig>(
@@ -88,6 +89,9 @@ public class Program
 
 
         builder.Services.AddScoped<IAPIBroker, APIBroker>();
+        builder.Services.AddHttpClient<IAPIBroker, APIBroker>()
+            .SetHandlerLifetime(TimeSpan.FromMinutes(5))
+            .AddPolicyHandler(GetRetryPolicy());
         builder.Services.AddScoped<IZoneInfoService, ZoneInfoService>();
         builder.Services.AddScoped<IRecordInfoService, RecordInfoService>();
         builder.Services.AddScoped<JSONErrorMiddleware>();
@@ -149,5 +153,12 @@ public class Program
         {
             Log.CloseAndFlush();
         }
+
+    }
+    static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
+    {
+        return HttpPolicyExtensions
+            .HandleTransientHttpError()
+            .WaitAndRetryAsync(6, retryAttempt => TimeSpan.FromMilliseconds(Math.Max(50, retryAttempt * 50)));
     }
 }
