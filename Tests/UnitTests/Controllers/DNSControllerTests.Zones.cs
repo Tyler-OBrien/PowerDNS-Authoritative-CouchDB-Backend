@@ -20,7 +20,7 @@ public partial class DNSControllerTests
         var includeDisabled = true;
 
         // Arrange
-        _mockZoneInfoService.Setup(service => service.GetAllZoneInfoAsync(includeDisabled)).ReturnsAsync(zones);
+        _mockZoneInfoService.Setup(service => service.GetAllZoneInfoAsync(includeDisabled, It.IsAny<CancellationToken>())).ReturnsAsync(zones);
 
         // Act
         var response = await _controller.GetZones(includeDisabled);
@@ -47,7 +47,7 @@ public partial class DNSControllerTests
         // Data
 
         // Arrange
-        _mockZoneInfoService.Setup(service => service.GetZoneInfoAsync(zoneName)).ReturnsAsync(zone);
+        _mockZoneInfoService.Setup(service => service.GetZoneInfoAsync(zoneName, It.IsAny<CancellationToken>())).ReturnsAsync(zone);
 
         // Act
         var response = await _controller.GetZone(zoneName);
@@ -77,7 +77,7 @@ public partial class DNSControllerTests
         var controllerResponse = new DataResponse<CouchDbOperationResult>(result);
 
         // Arrange
-        _mockZoneInfoService.Setup(service => service.SetZoneInfoAsync(newZone)).ReturnsAsync(apiresponse);
+        _mockZoneInfoService.Setup(service => service.SetZoneInfoAsync(newZone, It.IsAny<CancellationToken>())).ReturnsAsync(apiresponse);
 
         // Act
         var response = await _controller.NewZone(newZone);
@@ -105,7 +105,7 @@ public partial class DNSControllerTests
         var controllerResponse = new DataResponse<CouchDbOperationResult>(result);
 
         // Arrange
-        _mockZoneInfoService.Setup(service => service.DeleteZoneAsync(zone)).ReturnsAsync(apiresponse);
+        _mockZoneInfoService.Setup(service => service.DeleteZoneAsync(zone, It.IsAny<CancellationToken>())).ReturnsAsync(apiresponse);
 
         // Act
         var response = await _controller.DeleteZone(zone);

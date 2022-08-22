@@ -18,19 +18,19 @@ public class ZoneInfoService : IZoneInfoService
     }
 
 
-    public async Task<Zone?> GetZoneInfoAsync(string zoneName)
+    public async Task<Zone?> GetZoneInfoAsync(string zoneName, CancellationToken token = default)
     {
-        return await _apiBroker.GetZoneInfoAsync(zoneName);
+        return await _apiBroker.GetZoneInfoAsync(zoneName, token);
     }
 
-    public async Task<List<Zone>?> GetAllZoneInfoAsync(bool includeDisabled)
+    public async Task<List<Zone>?> GetAllZoneInfoAsync(bool includeDisabled, CancellationToken token = default)
     {
-        return await _apiBroker.GetAllZoneInfoAsync(includeDisabled);
+        return await _apiBroker.GetAllZoneInfoAsync(includeDisabled, token);
     }
 
-    public async Task<IOperationResult> SetZoneInfoAsync(Zone newZoneInfo)
+    public async Task<IOperationResult> SetZoneInfoAsync(Zone newZoneInfo, CancellationToken token = default)
     {
-        var response = await _apiBroker.SetZoneInfoAsync(newZoneInfo);
+        var response = await _apiBroker.SetZoneInfoAsync(newZoneInfo, token);
         if (response.IsSuccessStatusCode)
             return new GenericOperationResult<CouchDbOperationResult>(true, $"Created {newZoneInfo.ID}",
                 HttpStatusCode.OK, await response.GetCouchDBOperationResult());
@@ -43,13 +43,13 @@ public class ZoneInfoService : IZoneInfoService
         return new GenericOperationErrorResult(false, "Internal Error", HttpStatusCode.InternalServerError);
     }
 
-    public async Task<IOperationResult> DeleteZoneAsync(Zone zone)
+    public async Task<IOperationResult> DeleteZoneAsync(Zone zone, CancellationToken token = default)
     {
         if (zone.ID == null)
             return new GenericOperationErrorResult(false, "Zone ID cannot be null", HttpStatusCode.BadRequest);
 
 
-        var response = await _apiBroker.DeleteZoneAsync(zone);
+        var response = await _apiBroker.DeleteZoneAsync(zone, token);
         if (response.IsSuccessStatusCode)
             return new GenericOperationResult<CouchDbOperationResult>(true, $"Successfully deleted {zone}",
                 HttpStatusCode.OK, await response.GetCouchDBOperationResult());

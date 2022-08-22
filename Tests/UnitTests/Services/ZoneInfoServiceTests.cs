@@ -30,7 +30,7 @@ public class ZoneInfoServiceTests
     public async Task GetZoneInfoAsync(string zoneName, Zone zone)
     {
         // Arrange
-        _mockApiBroker.Setup(service => service.GetZoneInfoAsync(zoneName)).ReturnsAsync(zone);
+        _mockApiBroker.Setup(service => service.GetZoneInfoAsync(zoneName, It.IsAny<CancellationToken>())).ReturnsAsync(zone);
         // Act
         var response = await _zoneInfoService.GetZoneInfoAsync(zoneName);
         //Assert
@@ -45,7 +45,7 @@ public class ZoneInfoServiceTests
         // Data 
         var includeDisabled = true;
         // Arrange
-        _mockApiBroker.Setup(service => service.GetAllZoneInfoAsync(includeDisabled)).ReturnsAsync(zones);
+        _mockApiBroker.Setup(service => service.GetAllZoneInfoAsync(includeDisabled, It.IsAny<CancellationToken>())).ReturnsAsync(zones);
         // Act
         var response = await _zoneInfoService.GetAllZoneInfoAsync(includeDisabled);
         //Assert
@@ -62,7 +62,7 @@ public class ZoneInfoServiceTests
             { Content = new StringContent(JsonSerializer.Serialize(result)) };
 
         // Arrange
-        _mockApiBroker.Setup(service => service.SetZoneInfoAsync(newZoneInfo)).ReturnsAsync(Response);
+        _mockApiBroker.Setup(service => service.SetZoneInfoAsync(newZoneInfo, It.IsAny<CancellationToken>())).ReturnsAsync(Response);
         // Act
         var response = await _zoneInfoService.SetZoneInfoAsync(newZoneInfo);
         //Assert
@@ -81,7 +81,7 @@ public class ZoneInfoServiceTests
             { Content = new StringContent(JsonSerializer.Serialize(result)) };
 
         // Arrange
-        _mockApiBroker.Setup(service => service.DeleteZoneAsync(newZoneInfo)).ReturnsAsync(Response);
+        _mockApiBroker.Setup(service => service.DeleteZoneAsync(newZoneInfo, It.IsAny<CancellationToken>())).ReturnsAsync(Response);
         // Act
         var response = await _zoneInfoService.DeleteZoneAsync(newZoneInfo);
         //Assert
@@ -99,7 +99,7 @@ public class ZoneInfoServiceTests
         // Data 
         var Response = new HttpResponseMessage(HttpStatusCode.InternalServerError);
         // Arrange
-        _mockApiBroker.Setup(service => service.SetZoneInfoAsync(newZoneInfo)).ReturnsAsync(Response);
+        _mockApiBroker.Setup(service => service.SetZoneInfoAsync(newZoneInfo, It.IsAny<CancellationToken>())).ReturnsAsync(Response);
         // Act
         var response = _zoneInfoService.SetZoneInfoAsync(newZoneInfo);
         //Assert
@@ -114,7 +114,7 @@ public class ZoneInfoServiceTests
         // Data 
         var Response = new HttpResponseMessage(HttpStatusCode.InternalServerError);
         // Arrange
-        _mockApiBroker.Setup(service => service.DeleteZoneAsync(newZoneInfo)).ReturnsAsync(Response);
+        _mockApiBroker.Setup(service => service.DeleteZoneAsync(newZoneInfo, It.IsAny<CancellationToken>())).ReturnsAsync(Response);
         // Act
         var response = _zoneInfoService.DeleteZoneAsync(newZoneInfo);
         //Assert
@@ -131,7 +131,7 @@ public class ZoneInfoServiceTests
         var Response = new HttpResponseMessage(code);
 
         // Arrange
-        _mockApiBroker.Setup(service => service.DeleteZoneAsync(newZoneInfo)).ReturnsAsync(Response);
+        _mockApiBroker.Setup(service => service.DeleteZoneAsync(newZoneInfo, It.IsAny<CancellationToken>())).ReturnsAsync(Response);
         // Act
         var response = await _zoneInfoService.DeleteZoneAsync(newZoneInfo);
         //Assert

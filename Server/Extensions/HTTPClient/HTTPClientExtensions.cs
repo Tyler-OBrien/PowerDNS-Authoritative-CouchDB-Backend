@@ -36,14 +36,14 @@ public static class HTTPClientExtensions
     }
 
 
-    public static async Task<T?> GetFromJsonAsyncSupportNull<T>(this HttpClient client, string? requestUri)
+    public static async Task<T?> GetFromJsonAsyncSupportNull<T>(this HttpClient client, string? requestUri, CancellationToken token)
         where T : class
     {
-        var response = await client.GetAsync(requestUri);
+        var response = await client.GetAsync(requestUri, token);
         response.ThrowForServerSideErrors();
         if (response.IsSuccessStatusCode)
         {
-            var rawString = await response.Content.ReadAsStringAsync();
+            var rawString = await response.Content.ReadAsStringAsync(token);
 
 
             if (string.IsNullOrWhiteSpace(rawString) == false)
@@ -58,14 +58,14 @@ public static class HTTPClientExtensions
     }
 
     public static async Task<List<T>?> CouchDBViewGetFromJsonAsyncSupportNull<T>(this HttpClient client,
-        string? requestUri)
+        string? requestUri, CancellationToken token)
         where T : class
     {
         var response = await client.GetAsync(requestUri);
         response.ThrowForServerSideErrors();
         if (response.IsSuccessStatusCode)
         {
-            var rawString = await response.Content.ReadAsStringAsync();
+            var rawString = await response.Content.ReadAsStringAsync(token);
 
 
             if (string.IsNullOrWhiteSpace(rawString) == false)
@@ -103,14 +103,14 @@ public static class HTTPClientExtensions
     }
 
     public static async Task<List<TValue>?> CouchDBFindPostAsJsonGetJsonAsync<TInput, TValue>(this HttpClient client,
-        string? requestUri, TInput input)
+        string? requestUri, TInput input, CancellationToken token = default)
         where TValue : class
     {
-        var response = await client.PostAsJsonAsync(requestUri, input);
+        var response = await client.PostAsJsonAsync(requestUri, input, token);
         response.ThrowForServerSideErrors();
         if (response.IsSuccessStatusCode)
         {
-            var rawString = await response.Content.ReadAsStringAsync();
+            var rawString = await response.Content.ReadAsStringAsync(token);
 
 
             if (string.IsNullOrWhiteSpace(rawString) == false)

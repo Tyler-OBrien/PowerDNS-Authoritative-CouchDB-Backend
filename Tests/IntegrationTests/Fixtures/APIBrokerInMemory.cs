@@ -19,17 +19,17 @@ public class APIBrokerInMemory : IAPIBroker
         _records = new Dictionary<string, Record>(StringComparer.OrdinalIgnoreCase);
     }
 
-    public async Task<Zone?> GetZoneInfoAsync(string zoneName)
+    public async Task<Zone?> GetZoneInfoAsync(string zoneName, CancellationToken token = default)
     {
         return _zones.FirstOrDefault(zone => zone.Key.Equals(zoneName, StringComparison.OrdinalIgnoreCase)).Value;
     }
 
-    public async Task<List<Zone>?> GetAllZoneInfoAsync(bool includeDisabled)
+    public async Task<List<Zone>?> GetAllZoneInfoAsync(bool includeDisabled, CancellationToken token = default)
     {
         return _zones.Select(zone => zone.Value).ToList();
     }
 
-    public async Task<HttpResponseMessage> SetZoneInfoAsync(Zone newZoneInfo)
+    public async Task<HttpResponseMessage> SetZoneInfoAsync(Zone newZoneInfo, CancellationToken token = default)
     {
         if (string.IsNullOrWhiteSpace(newZoneInfo.ID)) newZoneInfo.ID = Guid.NewGuid().ToString("N");
 
@@ -42,7 +42,7 @@ public class APIBrokerInMemory : IAPIBroker
             { Content = new StringContent(JsonSerializer.Serialize(result)) };
     }
 
-    public async Task<HttpResponseMessage> DeleteZoneAsync(Zone zone)
+    public async Task<HttpResponseMessage> DeleteZoneAsync(Zone zone, CancellationToken token = default)
     {
         if (!_zones.ContainsKey(zone.ID)) return new HttpResponseMessage(HttpStatusCode.NotFound);
 
@@ -52,34 +52,34 @@ public class APIBrokerInMemory : IAPIBroker
             { Content = new StringContent(JsonSerializer.Serialize(result)) };
     }
 
-    public async Task<List<Record>?> GetRecordAsync(string queryName, string type)
+    public async Task<List<Record>?> GetRecordAsync(string queryName, string type, CancellationToken token = default)
     {
         return _records.Where(record =>
             record.Value.Name.Equals(queryName, StringComparison.OrdinalIgnoreCase) &&
             record.Value.Type.Equals(type, StringComparison.OrdinalIgnoreCase)).Select(record => record.Value).ToList();
     }
 
-    public async Task<Record?> GetRecordByIdAsync(string recordId)
+    public async Task<Record?> GetRecordByIdAsync(string recordId, CancellationToken token = default)
     {
         if (_records.TryGetValue(recordId, out var record))
             return record;
         return null;
     }
 
-    public async Task<List<Record>?> ListRecordAsync(string queryName)
+    public async Task<List<Record>?> ListRecordAsync(string queryName, CancellationToken token = default)
     {
         return _records.Where(record =>
                 record.Value.Name.Equals(queryName, StringComparison.OrdinalIgnoreCase)).Select(record => record.Value)
             .ToList();
     }
 
-    public async Task<List<Record>?> ListRecordByZoneIdAsync(uint zoneId)
+    public async Task<List<Record>?> ListRecordByZoneIdAsync(uint zoneId, CancellationToken token = default)
     {
         return _records.Where(record =>
             record.Value.zoneId.Equals(zoneId)).Select(record => record.Value).ToList();
     }
 
-    public async Task<HttpResponseMessage> SetRecordAsync(Record record)
+    public async Task<HttpResponseMessage> SetRecordAsync(Record record, CancellationToken token = default)
     {
         if (string.IsNullOrWhiteSpace(record.ID)) record.ID = Guid.NewGuid().ToString("N");
         if (_records.ContainsKey(record.ID)) return new HttpResponseMessage(HttpStatusCode.Conflict);
@@ -90,7 +90,7 @@ public class APIBrokerInMemory : IAPIBroker
             { Content = new StringContent(JsonSerializer.Serialize(result)) };
     }
 
-    public async Task<HttpResponseMessage> DeleteRecordAsync(Record record)
+    public async Task<HttpResponseMessage> DeleteRecordAsync(Record record, CancellationToken token = default)
     {
         if (!_records.ContainsKey(record.ID)) return new HttpResponseMessage(HttpStatusCode.NotFound);
 

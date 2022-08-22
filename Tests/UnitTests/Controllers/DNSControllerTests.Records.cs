@@ -20,7 +20,7 @@ public partial class DNSControllerTests
 
 
         // Arrange
-        _mockRecordInfoService.Setup(service => service.ListRecordAsync(zoneName)).ReturnsAsync(records);
+        _mockRecordInfoService.Setup(service => service.ListRecordAsync(zoneName, It.IsAny<CancellationToken>())).ReturnsAsync(records);
 
         // Act
         var response = await _controller.GetRecord(zoneName, "ANY");
@@ -48,7 +48,7 @@ public partial class DNSControllerTests
 
 
         // Arrange
-        _mockRecordInfoService.Setup(service => service.GetRecordAsync(zoneName, type)).ReturnsAsync(records);
+        _mockRecordInfoService.Setup(service => service.GetRecordAsync(zoneName, type, It.IsAny<CancellationToken>())).ReturnsAsync(records);
 
         // Act
         var response = await _controller.GetRecord(zoneName, type);
@@ -75,7 +75,7 @@ public partial class DNSControllerTests
 
 
         // Arrange
-        _mockRecordInfoService.Setup(service => service.GetRecordByIdAsync(recordId)).ReturnsAsync(record);
+        _mockRecordInfoService.Setup(service => service.GetRecordByIdAsync(recordId, It.IsAny<CancellationToken>())).ReturnsAsync(record);
 
         // Act
         var response = await _controller.GetRecordById(recordId);
@@ -104,7 +104,7 @@ public partial class DNSControllerTests
 
         // Arrange
         Record? newRecord = null;
-        _mockRecordInfoService.Setup(service => service.GetRecordByIdAsync(recordId)).ReturnsAsync(newRecord);
+        _mockRecordInfoService.Setup(service => service.GetRecordByIdAsync(recordId, It.IsAny<CancellationToken>())).ReturnsAsync(newRecord);
 
         // Act
         var response = await _controller.GetRecordById(recordId);
@@ -128,7 +128,7 @@ public partial class DNSControllerTests
 
 
         // Arrange
-        _mockRecordInfoService.Setup(service => service.ListRecordByZoneIdAsync(zoneID)).ReturnsAsync(records);
+        _mockRecordInfoService.Setup(service => service.ListRecordByZoneIdAsync(zoneID, It.IsAny<CancellationToken>())).ReturnsAsync(records);
 
         // Act
         var response = await _controller.ListRecords(zoneID);
@@ -156,7 +156,7 @@ public partial class DNSControllerTests
         var controllerResponse = new DataResponse<CouchDbOperationResult>(result);
 
         // Arrange
-        _mockRecordInfoService.Setup(service => service.SetRecordAsync(newRecord)).ReturnsAsync(apiresponse);
+        _mockRecordInfoService.Setup(service => service.SetRecordAsync(newRecord, It.IsAny<CancellationToken>())).ReturnsAsync(apiresponse);
 
         // Act
         var response = await _controller.NewRecord(newRecord);
@@ -184,7 +184,7 @@ public partial class DNSControllerTests
         var apiresponse = new GenericOperationResult<CouchDbOperationResult>(false, msg, code, result);
 
         // Arrange
-        _mockRecordInfoService.Setup(service => service.SetRecordAsync(newRecord)).ReturnsAsync(apiresponse);
+        _mockRecordInfoService.Setup(service => service.SetRecordAsync(newRecord, It.IsAny<CancellationToken>())).ReturnsAsync(apiresponse);
 
         // Act
         var response = await _controller.NewRecord(newRecord);
@@ -217,7 +217,7 @@ public partial class DNSControllerTests
         var controllerResponse = new DataResponse<CouchDbOperationResult>(result);
 
         // Arrange
-        _mockRecordInfoService.Setup(service => service.DeleteRecordAsync(newRecord)).ReturnsAsync(apiresponse);
+        _mockRecordInfoService.Setup(service => service.DeleteRecordAsync(newRecord, It.IsAny<CancellationToken>())).ReturnsAsync(apiresponse);
 
         // Act
         var response = await _controller.DeleteRecord(newRecord);
@@ -246,7 +246,7 @@ public partial class DNSControllerTests
         var apiresponse = new GenericOperationResult<CouchDbOperationResult>(false, msg, code, result);
 
         // Arrange
-        _mockRecordInfoService.Setup(service => service.DeleteRecordAsync(newRecord)).ReturnsAsync(apiresponse);
+        _mockRecordInfoService.Setup(service => service.DeleteRecordAsync(newRecord, It.IsAny<CancellationToken>())).ReturnsAsync(apiresponse);
 
         // Act
         var response = await _controller.DeleteRecord(newRecord);

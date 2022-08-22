@@ -22,27 +22,28 @@ public class PowerDNSController : ControllerBase
 
 
     [HttpGet("lookup/{qname}/{qtype}")]
-    public async Task<ActionResult<IDnsResponse>> Lookup(string qname, string qtype)
+    public async Task<ActionResult<IDnsResponse>> Lookup(string qname, string qtype, CancellationToken token = default)
     {
+        
         if (qtype.Equals("ANY", StringComparison.OrdinalIgnoreCase))
-            return Ok(new LookupResponse(await _recordInfoService.ListRecordAsync(qname)));
+            return Ok(new LookupResponse(await _recordInfoService.ListRecordAsync(qname, token)));
 
-        return Ok(new LookupResponse(await _recordInfoService.GetRecordAsync(qname, qtype)));
+        return Ok(new LookupResponse(await _recordInfoService.GetRecordAsync(qname, qtype, token)));
     }
 
 
     // Required
     [HttpGet("getAllDomainMetadata/{name}")]
-    public ActionResult<IDnsResponse> GetAllDomainMetadata(string name)
+    public ActionResult<IDnsResponse> GetAllDomainMetadata(string name, CancellationToken token = default)
     {
         return Ok(new ZoneMetaDataResponse());
     }
 
 
     [HttpGet("getDomainInfo/{name}")]
-    public async Task<ActionResult<GetZoneInfoResponse>> GetDomainInfo(string name)
+    public async Task<ActionResult<GetZoneInfoResponse>> GetDomainInfo(string name, CancellationToken token = default)
     {
-        var zoneInfo = await _zoneInfoService.GetZoneInfoAsync(name);
+        var zoneInfo = await _zoneInfoService.GetZoneInfoAsync(name, token);
         if (zoneInfo == null)
             // If we did want to handle this (to support the powerdns cli utility),
             // we would need to create the domain here, and still return none, and the cli will retry the request and get the newly created zone next time
@@ -53,7 +54,7 @@ public class PowerDNSController : ControllerBase
 
     // Fill Zone Cache
     [HttpGet("getAllDomains")]
-    public async Task<ActionResult<GetAllZoneInfoResponse>> GetAllDomains(bool includeDisabled)
+    public async Task<ActionResult<GetAllZoneInfoResponse>> GetAllDomains(bool includeDisabled, CancellationToken token = default)
     {
         return Ok(new GetAllZoneInfoResponse(await _zoneInfoService.GetAllZoneInfoAsync(includeDisabled)));
     }

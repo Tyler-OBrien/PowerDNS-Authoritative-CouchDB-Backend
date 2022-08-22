@@ -30,7 +30,7 @@ public class RecordInfoServiceTests
     public async Task ListRecordAsync(string queryName, List<Record> records)
     {
         // Arrange
-        _mockApiBroker.Setup(service => service.ListRecordAsync(queryName)).ReturnsAsync(records);
+        _mockApiBroker.Setup(service => service.ListRecordAsync(queryName, It.IsAny<CancellationToken>())).ReturnsAsync(records);
         // Act
         var response = await _recordInfoService.ListRecordAsync(queryName);
         //Assert
@@ -47,7 +47,7 @@ public class RecordInfoServiceTests
         var queryName = "example.com.";
         var actualName = "example.com";
         // Arrange
-        _mockApiBroker.Setup(service => service.ListRecordAsync(actualName)).ReturnsAsync(records);
+        _mockApiBroker.Setup(service => service.ListRecordAsync(actualName, It.IsAny<CancellationToken>())).ReturnsAsync(records);
         // Act
         var response = await _recordInfoService.ListRecordAsync(queryName);
         //Assert
@@ -60,7 +60,7 @@ public class RecordInfoServiceTests
     public async Task GetRecordById(Record record, string recordId)
     {
         // Arrange
-        _mockApiBroker.Setup(service => service.GetRecordByIdAsync(recordId)).ReturnsAsync(record);
+        _mockApiBroker.Setup(service => service.GetRecordByIdAsync(recordId, It.IsAny<CancellationToken>())).ReturnsAsync(record);
         // Act
         var response = await _recordInfoService.GetRecordByIdAsync(recordId);
         //Assert
@@ -73,7 +73,7 @@ public class RecordInfoServiceTests
     public async Task ListRecordByZoneIdAsync(List<Record> records, uint zoneId)
     {
         // Arrange
-        _mockApiBroker.Setup(service => service.ListRecordByZoneIdAsync(zoneId)).ReturnsAsync(records);
+        _mockApiBroker.Setup(service => service.ListRecordByZoneIdAsync(zoneId, It.IsAny<CancellationToken>())).ReturnsAsync(records);
         // Act
         var response = await _recordInfoService.ListRecordByZoneIdAsync(zoneId);
         //Assert
@@ -86,7 +86,7 @@ public class RecordInfoServiceTests
     public async Task GetRecordAsync(List<Record> records, string queryName, string type)
     {
         // Arrange
-        _mockApiBroker.Setup(service => service.GetRecordAsync(queryName, type)).ReturnsAsync(records);
+        _mockApiBroker.Setup(service => service.GetRecordAsync(queryName, type, It.IsAny<CancellationToken>())).ReturnsAsync(records);
         // Act
         var response = await _recordInfoService.GetRecordAsync(queryName, type);
         // Assert
@@ -102,7 +102,7 @@ public class RecordInfoServiceTests
         var Response = new HttpResponseMessage(HttpStatusCode.OK)
             { Content = new StringContent(JsonSerializer.Serialize(result)) };
         // Arrange
-        _mockApiBroker.Setup(service => service.SetRecordAsync(record)).ReturnsAsync(Response);
+        _mockApiBroker.Setup(service => service.SetRecordAsync(record, It.IsAny<CancellationToken>())).ReturnsAsync(Response);
         // Act
         var response = await _recordInfoService.SetRecordAsync(record);
         // Assert
@@ -122,7 +122,7 @@ public class RecordInfoServiceTests
         // Data
         var Response = new HttpResponseMessage(HttpStatusCode.Conflict);
         // Arrange
-        _mockApiBroker.Setup(service => service.SetRecordAsync(record)).ReturnsAsync(Response);
+        _mockApiBroker.Setup(service => service.SetRecordAsync(record, It.IsAny<CancellationToken>())).ReturnsAsync(Response);
         // Act
         var response = await _recordInfoService.SetRecordAsync(record);
         // Assert
@@ -142,7 +142,7 @@ public class RecordInfoServiceTests
         // Data
         var Response = new HttpResponseMessage(HttpStatusCode.InternalServerError);
         // Arrange
-        _mockApiBroker.Setup(service => service.SetRecordAsync(record)).ReturnsAsync(Response);
+        _mockApiBroker.Setup(service => service.SetRecordAsync(record, It.IsAny<CancellationToken>())).ReturnsAsync(Response);
         // Act
         var response = _recordInfoService.SetRecordAsync(record);
         // Assert
@@ -158,7 +158,7 @@ public class RecordInfoServiceTests
         var Response = new HttpResponseMessage(HttpStatusCode.OK)
             { Content = new StringContent(JsonSerializer.Serialize(result)) };
         // Arrange
-        _mockApiBroker.Setup(service => service.DeleteRecordAsync(record)).ReturnsAsync(Response);
+        _mockApiBroker.Setup(service => service.DeleteRecordAsync(record, It.IsAny<CancellationToken>())).ReturnsAsync(Response);
         // Act
         var response = await _recordInfoService.DeleteRecordAsync(record);
         // Assert
@@ -178,7 +178,7 @@ public class RecordInfoServiceTests
         // Data
         var Response = new HttpResponseMessage(HttpStatusCode.NotFound);
         // Arrange
-        _mockApiBroker.Setup(service => service.DeleteRecordAsync(record)).ReturnsAsync(Response);
+        _mockApiBroker.Setup(service => service.DeleteRecordAsync(record, It.IsAny<CancellationToken>())).ReturnsAsync(Response);
         // Act
         var response = await _recordInfoService.DeleteRecordAsync(record);
         // Assert
@@ -198,7 +198,7 @@ public class RecordInfoServiceTests
         // Data
         var Response = new HttpResponseMessage(HttpStatusCode.InternalServerError);
         // Arrange
-        _mockApiBroker.Setup(service => service.DeleteRecordAsync(record)).ReturnsAsync(Response);
+        _mockApiBroker.Setup(service => service.DeleteRecordAsync(record, It.IsAny<CancellationToken>())).ReturnsAsync(Response);
         // Act
         var response = _recordInfoService.DeleteRecordAsync(record);
         // Assert

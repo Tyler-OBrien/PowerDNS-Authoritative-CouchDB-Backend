@@ -16,32 +16,32 @@ public class RecordInfoService : IRecordInfoService
         _apiBroker = apiBroker;
     }
 
-    public async Task<List<Record>?> ListRecordAsync(string queryName)
+    public async Task<List<Record>?> ListRecordAsync(string queryName, CancellationToken token = default)
     {
         queryName = NormalizeQueryName(queryName);
-        return await _apiBroker.ListRecordAsync(queryName);
+        return await _apiBroker.ListRecordAsync(queryName, token);
     }
 
-    public async Task<Record?> GetRecordByIdAsync(string recordId)
+    public async Task<Record?> GetRecordByIdAsync(string recordId, CancellationToken token = default)
     {
-        return await _apiBroker.GetRecordByIdAsync(recordId);
+        return await _apiBroker.GetRecordByIdAsync(recordId, token);
     }
 
 
-    public async Task<List<Record>?> ListRecordByZoneIdAsync(uint zoneId)
+    public async Task<List<Record>?> ListRecordByZoneIdAsync(uint zoneId, CancellationToken token = default)
     {
-        return await _apiBroker.ListRecordByZoneIdAsync(zoneId);
+        return await _apiBroker.ListRecordByZoneIdAsync(zoneId, token);
     }
 
-    public async Task<List<Record>?> GetRecordAsync(string queryName, string type)
+    public async Task<List<Record>?> GetRecordAsync(string queryName, string type, CancellationToken token = default)
     {
         queryName = NormalizeQueryName(queryName);
-        return await _apiBroker.GetRecordAsync(queryName, type);
+        return await _apiBroker.GetRecordAsync(queryName, type, token);
     }
 
-    public async Task<IOperationResult> SetRecordAsync(Record record)
+    public async Task<IOperationResult> SetRecordAsync(Record record, CancellationToken token = default)
     {
-        var response = await _apiBroker.SetRecordAsync(record);
+        var response = await _apiBroker.SetRecordAsync(record, token);
         if (response.IsSuccessStatusCode)
             return new GenericOperationResult<CouchDbOperationResult>(true, $"Successfully created {record}",
                 HttpStatusCode.OK, await response.GetCouchDBOperationResult());
@@ -55,12 +55,12 @@ public class RecordInfoService : IRecordInfoService
         return new GenericOperationErrorResult(false, "Internal Error", HttpStatusCode.InternalServerError);
     }
 
-    public async Task<IOperationResult> DeleteRecordAsync(Record record)
+    public async Task<IOperationResult> DeleteRecordAsync(Record record, CancellationToken token = default)
     {
         if (record.ID == null)
             return new GenericOperationErrorResult(false, "Record ID cannot be null", HttpStatusCode.BadRequest);
 
-        var response = await _apiBroker.DeleteRecordAsync(record);
+        var response = await _apiBroker.DeleteRecordAsync(record, token);
         if (response.IsSuccessStatusCode)
             return new GenericOperationResult<CouchDbOperationResult>(true, $"Successfully deleted {record.ID}",
                 HttpStatusCode.OK, await response.GetCouchDBOperationResult());

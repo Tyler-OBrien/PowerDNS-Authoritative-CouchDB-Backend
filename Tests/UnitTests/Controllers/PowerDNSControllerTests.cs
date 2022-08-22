@@ -44,7 +44,7 @@ public class PowerDNSControllerTests
 
 
         // Arrange
-        _mockRecordInfoService.Setup(service => service.GetRecordAsync(qname, qtype)).ReturnsAsync(records);
+        _mockRecordInfoService.Setup(service => service.GetRecordAsync(qname, qtype, It.IsAny<CancellationToken>())).ReturnsAsync(records);
 
         // Act
         var response = await _controller.Lookup(qname, qtype);
@@ -74,7 +74,7 @@ public class PowerDNSControllerTests
 
 
         // Arrange
-        _mockRecordInfoService.Setup(service => service.ListRecordAsync(qname)).ReturnsAsync(records);
+        _mockRecordInfoService.Setup(service => service.ListRecordAsync(qname, It.IsAny<CancellationToken>())).ReturnsAsync(records);
 
         // Act
         var response = await _controller.Lookup(qname, qtype);
@@ -132,7 +132,7 @@ public class PowerDNSControllerTests
 
 
         // Arrange
-        _mockZoneInfoService.Setup(service => service.GetZoneInfoAsync(qname)).ReturnsAsync(zone);
+        _mockZoneInfoService.Setup(service => service.GetZoneInfoAsync(qname, It.IsAny<CancellationToken>())).ReturnsAsync(zone);
 
         // Act
         var response = await _controller.GetDomainInfo(qname);
@@ -161,7 +161,7 @@ public class PowerDNSControllerTests
 
 
         // Arrange
-        _mockZoneInfoService.Setup(service => service.GetAllZoneInfoAsync(includeDisabled)).ReturnsAsync(zones);
+        _mockZoneInfoService.Setup(service => service.GetAllZoneInfoAsync(includeDisabled, It.IsAny<CancellationToken>())).ReturnsAsync(zones);
 
         // Act
         var response = await _controller.GetAllDomains(includeDisabled);
