@@ -75,15 +75,11 @@ public class Program
         builder.WebHost.UseKestrel(options =>
         {
             options.AddServerHeader = false;
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            if (string.IsNullOrWhiteSpace(applicationConfig.UnixSocketFile) == false)
             {
-                const string UnixSocketPath = "/var/run/powerdns-backend.sock";
-                if (File.Exists(UnixSocketPath))
-                {
-                    File.Delete(UnixSocketPath);
-                }
+                if (File.Exists(applicationConfig.UnixSocketFile)) File.Delete(applicationConfig.UnixSocketFile);
 
-                options.ListenUnixSocket(UnixSocketPath);
+                options.ListenUnixSocket(applicationConfig.UnixSocketFile);
             }
         });
 

@@ -13,4 +13,6 @@ public class ApplicationConfig
     public string CouchDB_Records_Database { get; set; }
 
     public string CouchDB_Zones_Database { get; set; }
+
+    public string UnixSocketFile { get; set; }
 }
