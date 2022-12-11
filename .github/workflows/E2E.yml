@@ -25,7 +25,7 @@ jobs:
       run: |
         sudo apt-get update && sudo apt-get upgrade
         sudo apt-get install curl apt-transport-https gnupg dnsutils
-        echo "deb [arch=amd64] http://repo.powerdns.com/ubuntu focal-auth-46 main" | sudo tee -a /etc/apt/sources.list.d/pdns.list
+        echo "deb [arch=amd64] http://repo.powerdns.com/ubuntu focal-auth-47 main" | sudo tee -a /etc/apt/sources.list.d/pdns.list
         sudo tee -a /etc/apt/preferences.d/pdns > /dev/null <<EOT
         Package: pdns-*
         Pin: origin repo.powerdns.com
