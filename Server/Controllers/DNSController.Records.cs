@@ -13,9 +13,9 @@ public partial class DNSController
     {
         List<Record>? foundRecords;
         if (qType.Equals("ANY", StringComparison.OrdinalIgnoreCase))
-            foundRecords = await _recordInfoService.ListRecordAsync(qName, token);
+            foundRecords = await _recordInfoService.ListRecordAsync(qName, string.Empty, token);
         else
-            foundRecords = await _recordInfoService.GetRecordAsync(qName, qType, token);
+            foundRecords = await _recordInfoService.GetRecordAsync(qName, qType, string.Empty, token);
 
         if (foundRecords != null) return Ok(new DataResponse<List<Record>>(foundRecords));
         return Ok(new DataResponse<List<Record>>(new List<Record>()));

@@ -10,16 +10,23 @@ namespace PowerDNS_Auth_CouchDB_Remote_Backend.Services;
 public class RecordInfoService : IRecordInfoService
 {
     private readonly IAPIBroker _apiBroker;
+    private readonly IGeoIPService _geoIpService;
 
-    public RecordInfoService(IAPIBroker apiBroker)
+    public RecordInfoService(IAPIBroker apiBroker, IGeoIPService geoIpService)
     {
         _apiBroker = apiBroker;
+        _geoIpService = geoIpService;
     }
 
-    public async Task<List<Record>?> ListRecordAsync(string queryName, CancellationToken token = default)
+    public async Task<List<Record>?> ListRecordAsync(string queryName, string remoteIp, CancellationToken token = default)
     {
         queryName = NormalizeQueryName(queryName);
-        return await _apiBroker.ListRecordAsync(queryName, token);
+        var records = await _apiBroker.ListRecordAsync(queryName, token);
+        if (records == null)
+        {
+            return new List<Record>();
+        }
+        return await _geoIpService.ProcessGeoIp(records, remoteIp);
     }
 
     public async Task<Record?> GetRecordByIdAsync(string recordId, CancellationToken token = default)
@@ -33,10 +40,13 @@ public class RecordInfoService : IRecordInfoService
         return await _apiBroker.ListRecordByZoneIdAsync(zoneId, token);
     }
 
-    public async Task<List<Record>?> GetRecordAsync(string queryName, string type, CancellationToken token = default)
+    public async Task<List<Record>?> GetRecordAsync(string queryName, string type, string remoteIp, CancellationToken token = default)
     {
         queryName = NormalizeQueryName(queryName);
-        return await _apiBroker.GetRecordAsync(queryName, type, token);
+        var records = await _apiBroker.GetRecordAsync(queryName, type, token);
+        if (records == null) return new List<Record>();
+
+        return await _geoIpService.ProcessGeoIp(records, remoteIp);
     }
 
     public async Task<IOperationResult> SetRecordAsync(Record record, CancellationToken token = default)

@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using Microsoft.AspNetCore.Mvc;
 using PowerDNS_Auth_CouchDB_Remote_Backend.Models.Responses.PowerDNS_Responses;
 using PowerDNS_Auth_CouchDB_Remote_Backend.Models.Responses.PowerDNS_Responses.Lookup;
@@ -24,11 +25,26 @@ public class PowerDNSController : ControllerBase
     [HttpGet("lookup/{qname}/{qtype}")]
     public async Task<ActionResult<IDnsResponse>> Lookup(string qname, string qtype, CancellationToken token = default)
     {
-        
-        if (qtype.Equals("ANY", StringComparison.OrdinalIgnoreCase))
-            return Ok(new LookupResponse(await _recordInfoService.ListRecordAsync(qname, token)));
+        // Try Get IP for GeoIP
+        string remoteIP = string.Empty;
+        // Needed for Unit Testing!
+        if (HttpContext?.Request?.Headers != null)
+        {
+            if (HttpContext.Request.Headers.TryGetValue("X-Remotebackend-Real-Remote", out var EDnsIP))
+            {
+                remoteIP = EDnsIP.ToString();
+            }
+            else if (HttpContext.Request.Headers.TryGetValue("X-Remotebackend-Remote", out var DNSServerIP))
+            {
+                // For now disabled -- looks like PowerDNS will cache for different  EDNS Client Subnet information, but not for different remote information
+                remoteIP = DNSServerIP.ToString();
+            }
+        }
 
-        return Ok(new LookupResponse(await _recordInfoService.GetRecordAsync(qname, qtype, token)));
+        if (qtype.Equals("ANY", StringComparison.OrdinalIgnoreCase))
+            return Ok(new LookupResponse(await _recordInfoService.ListRecordAsync(qname, remoteIP, token)));
+
+        return Ok(new LookupResponse(await _recordInfoService.GetRecordAsync(qname, qtype, remoteIP, token)));
     }
 
 

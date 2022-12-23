@@ -7,6 +7,7 @@ using NUnit.Framework;
 using PowerDNS_Auth_CouchDB_Remote_Backend.Brokers;
 using PowerDNS_Auth_CouchDB_Remote_Backend.Models;
 using PowerDNS_Auth_CouchDB_Remote_Backend.Models.CouchDB;
+using PowerDNS_Auth_CouchDB_Remote_Backend.Models.Services;
 using PowerDNS_Auth_CouchDB_Remote_Backend.Services;
 
 namespace UnitTests.Services;
@@ -15,14 +16,21 @@ public class RecordInfoServiceTests
 {
     private readonly IAPIBroker _apiBroker;
     private readonly Mock<IAPIBroker> _mockApiBroker;
+    private readonly IGeoIPService _geoIPService;
+    private readonly Mock<IGeoIPService> _mockGeoIPService;
 
     private readonly RecordInfoService _recordInfoService;
 
     public RecordInfoServiceTests()
     {
         _mockApiBroker = new Mock<IAPIBroker>(MockBehavior.Strict);
+        _mockGeoIPService = new Mock<IGeoIPService>();
+
+
         _apiBroker = _mockApiBroker.Object;
-        _recordInfoService = new RecordInfoService(_apiBroker);
+        _geoIPService = _mockGeoIPService.Object;
+        
+        _recordInfoService = new RecordInfoService(_apiBroker, _geoIPService);
     }
 
     [Test]
@@ -32,7 +40,7 @@ public class RecordInfoServiceTests
         // Arrange
         _mockApiBroker.Setup(service => service.ListRecordAsync(queryName, It.IsAny<CancellationToken>())).ReturnsAsync(records);
         // Act
-        var response = await _recordInfoService.ListRecordAsync(queryName);
+        var response = await _recordInfoService.ListRecordAsync(queryName, string.Empty);
         //Assert
         response.Should().NotBeNull("Response should not be null");
         response.Should().BeEquivalentTo(records);
@@ -48,8 +56,11 @@ public class RecordInfoServiceTests
         var actualName = "example.com";
         // Arrange
         _mockApiBroker.Setup(service => service.ListRecordAsync(actualName, It.IsAny<CancellationToken>())).ReturnsAsync(records);
+        // Mock GeoIP Responses
+        _mockGeoIPService.Setup(service => service.ProcessGeoIp(It.IsAny<List<Record>>(), It.IsAny<string>()))
+            .ReturnsAsync((List<Record> value, string remoteIP) => value);
         // Act
-        var response = await _recordInfoService.ListRecordAsync(queryName);
+        var response = await _recordInfoService.ListRecordAsync(queryName, string.Empty);
         //Assert
         response.Should().NotBeNull("Response should not be null");
         response.Should().BeEquivalentTo(records);
@@ -74,6 +85,9 @@ public class RecordInfoServiceTests
     {
         // Arrange
         _mockApiBroker.Setup(service => service.ListRecordByZoneIdAsync(zoneId, It.IsAny<CancellationToken>())).ReturnsAsync(records);
+        // Mock GeoIP Responses
+        _mockGeoIPService.Setup(service => service.ProcessGeoIp(It.IsAny<List<Record>>(), It.IsAny<string>()))
+            .ReturnsAsync((List<Record> value, string remoteIP) => value);
         // Act
         var response = await _recordInfoService.ListRecordByZoneIdAsync(zoneId);
         //Assert
@@ -87,8 +101,11 @@ public class RecordInfoServiceTests
     {
         // Arrange
         _mockApiBroker.Setup(service => service.GetRecordAsync(queryName, type, It.IsAny<CancellationToken>())).ReturnsAsync(records);
+        // Mock GeoIP Responses
+        _mockGeoIPService.Setup(service => service.ProcessGeoIp(It.IsAny<List<Record>>(), It.IsAny<string>()))
+            .ReturnsAsync((List<Record> value, string remoteIP) => value);
         // Act
-        var response = await _recordInfoService.GetRecordAsync(queryName, type);
+        var response = await _recordInfoService.GetRecordAsync(queryName, type, string.Empty);
         // Assert
         response.Should().NotBeNull("Response should not be null");
         response.Should().BeEquivalentTo(records);
@@ -204,4 +221,8 @@ public class RecordInfoServiceTests
         // Assert
         Assert.ThrowsAsync<HttpRequestException>(() => response);
     }
+
+
+
+
 }

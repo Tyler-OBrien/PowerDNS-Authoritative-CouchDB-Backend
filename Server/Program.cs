@@ -91,6 +91,7 @@ public class Program
         builder.Services.AddScoped<IZoneInfoService, ZoneInfoService>();
         builder.Services.AddScoped<IRecordInfoService, RecordInfoService>();
         builder.Services.AddScoped<JSONErrorMiddleware>();
+        builder.Services.AddSingleton<IGeoIPService, IP2LocationGeoService>();
         builder.Services.Configure<ApiBehaviorOptions>(options =>
         {
             options.InvalidModelStateResponseFactory = ctx => new ModelStateFilterJSON();
@@ -119,10 +120,6 @@ public class Program
                 Log.Information(
                     $"{context.Request.GetDisplayUrl()} - {context.Request.Scheme} - {context.Request.Method} - {string.Join("|", context.Request.Headers.Select(i => $"{i.Key}={i.Value}"))} - Reply: {context.Response.StatusCode}");
             });
-        }
-        else
-        {
-            app.UseHttpsRedirection();
         }
 
         app.UseMiddleware<JSONErrorMiddleware>();

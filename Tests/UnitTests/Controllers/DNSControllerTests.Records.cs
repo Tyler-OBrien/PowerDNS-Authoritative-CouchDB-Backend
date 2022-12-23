@@ -20,7 +20,7 @@ public partial class DNSControllerTests
 
 
         // Arrange
-        _mockRecordInfoService.Setup(service => service.ListRecordAsync(zoneName, It.IsAny<CancellationToken>())).ReturnsAsync(records);
+        _mockRecordInfoService.Setup(service => service.ListRecordAsync(zoneName, It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(records);
 
         // Act
         var response = await _controller.GetRecord(zoneName, "ANY");
@@ -48,7 +48,7 @@ public partial class DNSControllerTests
 
 
         // Arrange
-        _mockRecordInfoService.Setup(service => service.GetRecordAsync(zoneName, type, It.IsAny<CancellationToken>())).ReturnsAsync(records);
+        _mockRecordInfoService.Setup(service => service.GetRecordAsync(zoneName, type, It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(records);
 
         // Act
         var response = await _controller.GetRecord(zoneName, type);

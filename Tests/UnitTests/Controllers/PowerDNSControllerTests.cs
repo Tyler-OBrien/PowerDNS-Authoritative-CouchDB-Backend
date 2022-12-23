@@ -44,7 +44,7 @@ public class PowerDNSControllerTests
 
 
         // Arrange
-        _mockRecordInfoService.Setup(service => service.GetRecordAsync(qname, qtype, It.IsAny<CancellationToken>())).ReturnsAsync(records);
+        _mockRecordInfoService.Setup(service => service.GetRecordAsync(qname, qtype, It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(records);
 
         // Act
         var response = await _controller.Lookup(qname, qtype);
@@ -74,7 +74,7 @@ public class PowerDNSControllerTests
 
 
         // Arrange
-        _mockRecordInfoService.Setup(service => service.ListRecordAsync(qname, It.IsAny<CancellationToken>())).ReturnsAsync(records);
+        _mockRecordInfoService.Setup(service => service.ListRecordAsync(qname, It.IsAny<string>(), It.IsAny<CancellationToken>())).ReturnsAsync(records);
 
         // Act
         var response = await _controller.Lookup(qname, qtype);
