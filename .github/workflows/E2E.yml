@@ -17,6 +17,7 @@ jobs:
       with:
         dotnet-version: 8.x.x
         dotnet-quality: 'preview'
+        include-prerelease: true
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
