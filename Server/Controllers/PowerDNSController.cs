@@ -23,6 +23,7 @@ public class PowerDNSController : ControllerBase
 
 
     [HttpGet("lookup/{qname}/{qtype}")]
+    [ResponseCacheAttribute(Duration = 30, Location = ResponseCacheLocation.Any /* If we had geoip stuff on VaryByHeader = "X-Remotebackend-Real-Remote,X-Remotebackend-Remote") */ )]
     public async Task<ActionResult<IDnsResponse>> Lookup(string qname, string qtype, CancellationToken token = default)
     {
         // Try Get IP for GeoIP
@@ -50,6 +51,7 @@ public class PowerDNSController : ControllerBase
 
     // Required
     [HttpGet("getAllDomainMetadata/{name}")]
+    [ResponseCacheAttribute(Duration = 10, Location = ResponseCacheLocation.Any)]
     public ActionResult<IDnsResponse> GetAllDomainMetadata(string name, CancellationToken token = default)
     {
         return Ok(new ZoneMetaDataResponse());
@@ -57,6 +59,7 @@ public class PowerDNSController : ControllerBase
 
 
     [HttpGet("getDomainInfo/{name}")]
+    [ResponseCacheAttribute(Duration = 10, Location = ResponseCacheLocation.Any)]
     public async Task<ActionResult<GetZoneInfoResponse>> GetDomainInfo(string name, CancellationToken token = default)
     {
         var zoneInfo = await _zoneInfoService.GetZoneInfoAsync(name, token);
@@ -70,6 +73,7 @@ public class PowerDNSController : ControllerBase
 
     // Fill Zone Cache
     [HttpGet("getAllDomains")]
+    [ResponseCacheAttribute(Duration = 10, Location = ResponseCacheLocation.Any)]
     public async Task<ActionResult<GetAllZoneInfoResponse>> GetAllDomains(bool includeDisabled, CancellationToken token = default)
     {
         return Ok(new GetAllZoneInfoResponse(await _zoneInfoService.GetAllZoneInfoAsync(includeDisabled)));

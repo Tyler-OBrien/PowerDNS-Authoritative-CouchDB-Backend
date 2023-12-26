@@ -52,6 +52,11 @@ public class Program
                 options.MinimumBreadcrumbLevel = LogLevel.Debug;
                 options.MinimumEventLevel = LogLevel.Warning;
             });
+        builder.Services.AddResponseCaching(options =>
+        {
+            // 8MB max
+            options.UseCaseSensitivePaths = true;
+        });
 
 
         // Add services to the container.
@@ -74,7 +79,6 @@ public class Program
 
         builder.WebHost.UseKestrel(options =>
         {
-            options.AddServerHeader = false;
             if (string.IsNullOrWhiteSpace(applicationConfig.UnixSocketFile) == false)
             {
                 if (File.Exists(applicationConfig.UnixSocketFile)) File.Delete(applicationConfig.UnixSocketFile);
@@ -86,7 +90,6 @@ public class Program
 
         builder.Services.AddScoped<IAPIBroker, APIBroker>();
         builder.Services.AddHttpClient<IAPIBroker, APIBroker>()
-            .SetHandlerLifetime(TimeSpan.FromMinutes(5))
             .AddPolicyHandler(GetRetryPolicy());
         builder.Services.AddScoped<IZoneInfoService, ZoneInfoService>();
         builder.Services.AddScoped<IRecordInfoService, RecordInfoService>();
@@ -95,6 +98,11 @@ public class Program
         builder.Services.Configure<ApiBehaviorOptions>(options =>
         {
             options.InvalidModelStateResponseFactory = ctx => new ModelStateFilterJSON();
+        });
+        builder.Services.AddMemoryCache(options =>
+        {
+            // ~341 MiB of Ram
+            options.SizeLimit = 357913941;
         });
 
 
@@ -125,7 +133,7 @@ public class Program
         app.UseMiddleware<JSONErrorMiddleware>();
 
         app.UseAuthorization();
-
+        app.UseResponseCaching();
         app.MapControllers();
 
 
