@@ -29,7 +29,6 @@ public class IP2LocationGeoService : IGeoIPService
         else
         {
             _dbReaderIPv4 = new Component();
-            _dbReaderIPv4.UseMemoryMappedFile = true;
             _dbReaderIPv4.Open(DB3_IPV4, true);
         }
 
@@ -41,7 +40,6 @@ public class IP2LocationGeoService : IGeoIPService
         else
         {
             _dbReaderIPv6 = new Component();
-            _dbReaderIPv6.UseMemoryMappedFile = true;
             _dbReaderIPv6.Open(DB3_IPV6, true);
         }
     }

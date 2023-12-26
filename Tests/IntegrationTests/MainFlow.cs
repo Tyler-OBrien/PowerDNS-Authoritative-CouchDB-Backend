@@ -97,4 +97,9 @@ public class MainFlow
             .BeTrue(
                 $"We should be able to delete our Zone, we got back {await tryDeleteZone.Content.ReadAsStringAsync()}");
     }
+    [OneTimeTearDown]
+    public void Dispose()
+    {
+        _client.Dispose();
+    }
 }
